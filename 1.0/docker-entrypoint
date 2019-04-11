@@ -77,11 +77,6 @@ fi
     JAVA_OPTS="$JAVA_OPTS -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=$REMOTE_DEBUG_PORT"
 fi
 
-# skywalking 配置
-if [[ ! -z "$SKYWALKING_AGENT_PATH" && ! -z "$SKYWALKING_CONFIG_PATH" ]]; then
-    JAVA_OPTS="$JAVA_OPTS -javaagent:$SKYWALKING_AGENT_PATH -Dskywalking_config=$SKYWALKING_CONFIG_PATH"
-fi
-
 echo $JAVA_OPTS
 # 启动 java
 exec "java" $JAVA_OPTS -jar $JAR_NAME $*
