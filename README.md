@@ -38,7 +38,7 @@
     <td>JVM_XSS</td>
     <td>否</td>
     <td>jvm默认值</td>
-    <td>线程堆栈</td>
+    <td>栈大小(线程)</td>
 </tr>
 <tr>
     <td>JVM_SURVIVOR_RATIO</td>
@@ -50,7 +50,7 @@
     <td>JVM_MAX_PERM_SIZE</td>
     <td>否</td>
     <td>jvm默认值</td>
-    <td>持久代</td>
+    <td>永久代(方法区)</td>
 </tr>
 <tr>
     <td>JVM_HEAP_DUMP_PATH</td>
@@ -81,5 +81,11 @@
     <td>否</td>
     <td>无</td>
     <td>远程debug端口</td>
+</tr>
+<tr>
+    <td>JVM_MAX_DIRECT_MEMORY</td>
+    <td>否</td>
+    <td>jvm默认值</td>
+    <td>最大直接内存</td>
 </tr>
 </table>

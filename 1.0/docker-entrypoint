@@ -33,7 +33,7 @@ if [ ! -z "$JVM_XMN" ]; then
     JAVA_OPTS="$JAVA_OPTS -Xmn$JVM_XMN"
 fi
 
-# -Xss(线程堆栈),默认使用JVM默认值
+# -Xss(栈大小(线程)),默认使用JVM默认值
 if [ ! -z "$JVM_XSS" ]; then
     JAVA_OPTS="$JAVA_OPTS -Xss$JVM_XSS"
 fi
@@ -43,12 +43,22 @@ if [ ! -z "$JVM_SURVIVOR_RATIO" ]; then
     JAVA_OPTS="$JAVA_OPTS -XX:SurvivorRatio=$JVM_SURVIVOR_RATIO"
 fi
 
-# -XX:MaxPermSize(持久代)
+# -XX:+PrintGCDetails 打印内存回收日志
+if [ ! -z "$JVM_PRINT_GC_DETAILS" ]; then
+    JAVA_OPTS="$JAVA_OPTS -XX:+PrintGCDetails"
+fi
+
+# -XX:MaxDirectMemorySize(最大直接内存)
+if [ ! -z "$JVM_MAX_DIRECT_MEMORY" ]; then
+    JAVA_OPTS="$JAVA_OPTS -XX:MaxDirectMemorySize=$JVM_MAX_DIRECT_MEMORY"
+fi
+
+# -XX:MaxPermSize(永久代-方法区)
 if [ ! -z "$JVM_MAX_PERM_SIZE" ]; then
     JAVA_OPTS="$JAVA_OPTS -XX:MaxPermSize=$JVM_MAX_PERM_SIZE"
 fi
 
-# 当指定内存快照保存路径时开启内存溢出导出内存快找
+# 当指定内存快照保存路径时开启内存溢出导出内存快照
 if [ ! -z "$JVM_HEAP_DUMP_PATH" ]; then
     JAVA_OPTS="$JAVA_OPTS -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=$JVM_HEAP_DUMP_PATH"
 fi
