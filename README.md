@@ -1,6 +1,5 @@
 # java
-一个运行java的基础镜像,包含open-jdk、arthas、启动脚本
-
+一个运行java的基础镜像,包含open-jdk1.8、arthas、启动脚本
 
 ## 环境变量清单
 <table>
