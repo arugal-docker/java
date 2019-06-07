@@ -82,6 +82,15 @@ if [ ! -z "$JVM_CLASS_PATH" ]; then
     JAVA_OPTS="$JAVA_OPTS -classpath $CLASSPATH"
 fi
 
+# javaagent 参数设置
+if [ ! -z "$JAVA_AGENT" ]; then
+    array=(${JAVA_AGENT//,/ })  
+    for var in ${array[@]}
+    do
+        JAVA_OPTS="$JAVA_OPTS -javagent:$var"
+    done
+fi
+
 # REMOTE_DEBUG_PORT,当指定REMOTE_DEBUG_PORT变量后,会开启远程debug功能
     if [[ ! -z "$REMOTE_DEBUG_PORT" ]]; then
     JAVA_OPTS="$JAVA_OPTS -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=$REMOTE_DEBUG_PORT"
