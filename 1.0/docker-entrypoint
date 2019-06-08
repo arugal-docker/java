@@ -82,16 +82,11 @@ if [ ! -z "$JVM_CLASS_PATH" ]; then
     JAVA_OPTS="$JAVA_OPTS -classpath $CLASSPATH"
 fi
 
-# javaagent 参数设置
+# javaagent 参数设置 由于 busybox 的 sh 环境不支持数据,无法使用字符串分隔来设置多个 javaagent
+# 又要考虑同时设置多个javaagent的情况 -> JAVA_AGENT=-javaagent:agent1.jar -javaagent:agent2.jar
+# 所以直接将 JAVA_AGENT 拼接在 JAVA_OPTS 上,设置时需要注意
 if [ ! -z "$JAVA_AGENT" ]; then
-    OLD_IFS="$IFS"
-    IFS=","
-    array=($JAVA_AGENT)
-    IFS="$OLD_IFS"
-    for var in ${array[@]}
-    do
-        JAVA_OPTS="$JAVA_OPTS -javagent:$var"
-    done
+    JAVA_OPTS="$JAVA_OPTS $JAVA_AGENT"
 fi
 
 # REMOTE_DEBUG_PORT,当指定REMOTE_DEBUG_PORT变量后,会开启远程debug功能
