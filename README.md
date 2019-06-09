@@ -73,7 +73,7 @@
     <td>JAVA_AGENT</td>
     <td>否</td>
     <td>无</td>
-    <td>javaagent配置,使用,分隔多个agent</td>
+    <td>javaagent配置,-javaagent=agent1.jar -javaagent=agent2.jar</td>
 </tr>
 <tr>
     <td>JVM_CLASS_PATH</td>
