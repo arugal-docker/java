@@ -2,6 +2,9 @@
 
 set -e
 
+# 优化点: 1.预留变量方便拼接脚本内不包含的属性
+#        2.使用$1作为JAR_NAME定义不清晰
+
 # JAR_NAME
 if [ "$1" ]; then # 使用第一个参数作为 JAR_NAME,优先级高于环境变量
     JAR_NAME="$1"
@@ -82,7 +85,7 @@ if [ ! -z "$JVM_CLASS_PATH" ]; then
     JAVA_OPTS="$JAVA_OPTS -classpath $CLASSPATH"
 fi
 
-# javaagent 参数设置 由于 busybox 的 sh 环境不支持数据,无法使用字符串分隔来设置多个 javaagent
+# javaagent 参数设置 由于 busybox 的 sh 环境不支持数组,无法使用字符串分隔来设置多个 javaagent
 # 又要考虑同时设置多个javaagent的情况 -> JAVA_AGENT=-javaagent:agent1.jar -javaagent:agent2.jar
 # 所以直接将 JAVA_AGENT 拼接在 JAVA_OPTS 上,设置时需要注意
 if [ ! -z "$JAVA_AGENT" ]; then
