@@ -19,9 +19,9 @@ fi
 
 # -Xmx(最大堆),默认为128M
 if [ -z "$JVM_XMX" ]; then
-    JAVA_OPTS="-Xmx128M"
+    JAVA_OPTS="$JAVA_OPTS -Xmx128M"
 else
-    JAVA_OPTS="-Xmx$JVM_XMX"
+    JAVA_OPTS="$JAVA_OPTS -Xmx$JVM_XMX"
 fi
 
 # -Xms(初始堆),默认为64M
@@ -93,7 +93,7 @@ if [ ! -z "$JAVA_AGENT" ]; then
 fi
 
 # REMOTE_DEBUG_PORT,当指定REMOTE_DEBUG_PORT变量后,会开启远程debug功能
-    if [[ ! -z "$REMOTE_DEBUG_PORT" ]]; then
+if [[ ! -z "$REMOTE_DEBUG_PORT" ]]; then
     JAVA_OPTS="$JAVA_OPTS -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=$REMOTE_DEBUG_PORT"
 fi
 
