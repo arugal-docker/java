@@ -1,0 +1,102 @@
+#!/bin/sh
+
+set -e
+
+# 优化点: 1.预留变量方便拼接脚本内不包含的属性
+#        2.使用$1作为JAR_NAME定义不清晰
+
+# JAR_NAME
+if [ "$1" ]; then # 使用第一个参数作为 JAR_NAME,优先级高于环境变量
+    JAR_NAME="$1"
+    shift
+fi
+
+# 当没有设置 jar_name 时打印提示信息后退出执行
+if [ -z "$JAR_NAME" ]; then
+    echo "please export JAR_NAME=application.jar or ./docker-entrypoint.sh application.jar"
+    exit 1    
+fi
+
+# -Xmx(最大堆),默认为128M
+if [ -z "$JVM_XMX" ]; then
+    JAVA_OPTS="$JAVA_OPTS -Xmx128M"
+else
+    JAVA_OPTS="$JAVA_OPTS -Xmx$JVM_XMX"
+fi
+
+# -Xms(初始堆),默认为64M
+if [ -z "$JVM_XMS" ]; then
+    JAVA_OPTS="$JAVA_OPTS -Xms64M"
+else
+    JAVA_OPTS="$JAVA_OPTS -Xms$JVM_XMS"
+fi
+
+# -Xmn(新生代),默认使用JVM默认值
+if [ ! -z "$JVM_XMN" ]; then
+    JAVA_OPTS="$JAVA_OPTS -Xmn$JVM_XMN"
+fi
+
+# -Xss(栈大小(线程)),默认使用JVM默认值
+if [ ! -z "$JVM_XSS" ]; then
+    JAVA_OPTS="$JAVA_OPTS -Xss$JVM_XSS"
+fi
+
+# -XX:SurvivorRatio(Eden区与Survivor区的大小比值)
+if [ ! -z "$JVM_SURVIVOR_RATIO" ]; then
+    JAVA_OPTS="$JAVA_OPTS -XX:SurvivorRatio=$JVM_SURVIVOR_RATIO"
+fi
+
+# -XX:+PrintGCDetails 打印内存回收日志
+if [ ! -z "$JVM_PRINT_GC_DETAILS" ]; then
+    JAVA_OPTS="$JAVA_OPTS -XX:+PrintGCDetails"
+fi
+
+# -XX:MaxDirectMemorySize(最大直接内存)
+if [ ! -z "$JVM_MAX_DIRECT_MEMORY" ]; then
+    JAVA_OPTS="$JAVA_OPTS -XX:MaxDirectMemorySize=$JVM_MAX_DIRECT_MEMORY"
+fi
+
+# -XX:MaxPermSize(永久代-方法区)
+if [ ! -z "$JVM_MAX_PERM_SIZE" ]; then
+    JAVA_OPTS="$JAVA_OPTS -XX:MaxPermSize=$JVM_MAX_PERM_SIZE"
+fi
+
+# 当指定内存快照保存路径时开启内存溢出导出内存快照
+if [ ! -z "$JVM_HEAP_DUMP_PATH" ]; then
+    JAVA_OPTS="$JAVA_OPTS -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=$JVM_HEAP_DUMP_PATH"
+fi
+
+# -XX:MaxTenuringThreshold(垃圾最大年龄)
+if [ ! -z "$JVM_MAX_TENURING_THRESHOLD" ]; then
+    JAVA_OPTS="$JAVA_OPTS -XX:MaxTenuringThreshold=$JVM_MAX_TENURING_THRESHOLD"
+fi
+
+# -server
+if [ ! -z "$JVM_SERVER" ]; then
+    JAVA_OPTS="$JAVA_OPTS -server"
+fi
+
+# 根据指定的 JVM_CLASS_PATH 变量设置 classpath
+if [ ! -z "$JVM_CLASS_PATH" ]; then
+    for i in $JVM_CLASS_PATH/*.jar
+    do  
+        CLASSPATH="$i:$CLASSPATH"
+    done
+    JAVA_OPTS="$JAVA_OPTS -classpath $CLASSPATH"
+fi
+
+# javaagent 参数设置 由于 busybox 的 sh 环境不支持数组,无法使用字符串分隔来设置多个 javaagent
+# 又要考虑同时设置多个javaagent的情况 -> JAVA_AGENT=-javaagent:agent1.jar -javaagent:agent2.jar
+# 所以直接将 JAVA_AGENT 拼接在 JAVA_OPTS 上,设置时需要注意
+if [ ! -z "$JAVA_AGENT" ]; then
+    JAVA_OPTS="$JAVA_OPTS $JAVA_AGENT"
+fi
+
+# REMOTE_DEBUG_PORT,当指定REMOTE_DEBUG_PORT变量后,会开启远程debug功能
+if [[ ! -z "$REMOTE_DEBUG_PORT" ]]; then
+    JAVA_OPTS="$JAVA_OPTS -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=$REMOTE_DEBUG_PORT"
+fi
+
+echo $JAVA_OPTS
+# 启动 java
+exec "java" $JAVA_OPTS -jar $JAR_NAME $*
